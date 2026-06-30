@@ -1,0 +1,436 @@
+{
+  "name": "fashion-store-whatsapp-bot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f803acb5-ac5a-42e1-95c9-8c3c390a5494",
+      "name": "Webhook",
+      "webhookId": "88772616-e998-4441-af32-d7beaa3f32f1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "= {{ $json.userMessage }}",
+        "options": {
+          "systemMessage": "You are a Fashion Store assistant. Help customers place orders and check order status\n\nWhen a customer places an order, always ask for their email address. Once they provide it, send them a confirmation email using the Gmail tool."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "893b1598-f7be-44be-bf96-081a14e220d7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $(\"Extract Message\").item.json.fromNumber }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        320,
+        288
+      ],
+      "id": "45dbb0eb-6086-4d82-941e-bc78d2ace0bf",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "from": "=whatsapp:+14155238886",
+        "to": "={{ $(\"Extract Message\").item.json.fromNumber }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "c78d6ad7-a176-4387-9f76-b6dcdcdf9418",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "bP9mDXYRv3jqzMOB",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "b45a67a8-28f0-4ded-b8d8-9ba30634219e",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "msg",
+              "name": "userMessage",
+              "value": "={{ $json.body.Body }}",
+              "type": "string"
+            },
+            {
+              "id": "from",
+              "name": "fromNumber",
+              "value": "={{ $json.body.From }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b40d012-0b20-4951-bb69-c40265a94098",
+      "name": "Extract Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1x8D_AJ5HXRI3FYxzUyJSkjYkAZ9WP3D1AAaL7klI2g0",
+          "mode": "list",
+          "cachedResultName": "Store Bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x8D_AJ5HXRI3FYxzUyJSkjYkAZ9WP3D1AAaL7klI2g0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x8D_AJ5HXRI3FYxzUyJSkjYkAZ9WP3D1AAaL7klI2g0/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        288
+      ],
+      "id": "7940e1ac-dc33-47a2-902b-9af39007859f",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2zpUqyaq32fmDQzX",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1x8D_AJ5HXRI3FYxzUyJSkjYkAZ9WP3D1AAaL7klI2g0",
+          "mode": "list",
+          "cachedResultName": "Store Bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x8D_AJ5HXRI3FYxzUyJSkjYkAZ9WP3D1AAaL7klI2g0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x8D_AJ5HXRI3FYxzUyJSkjYkAZ9WP3D1AAaL7klI2g0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order ID": "={{ Math.random().toString(36).substr(2, 9) }}",
+            "Customer Name": "={{ $fromAI('name') }}",
+            "Phone": "={{ $('Extract Message').item.json.fromNumber }}",
+            "Product": "={{ $fromAI('product') }}",
+            "Size": "={{ $fromAI('size') }}",
+            "Color": "={{ $fromAI('color') }}",
+            "Status": "=Pending",
+            "Date": "={{ new Date().toLocaleDateString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order ID",
+              "displayName": "Order ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Color",
+              "displayName": "Color",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        704,
+        288
+      ],
+      "id": "cc010e1e-9e65-4529-bbe0-d49e337a7d78",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2zpUqyaq32fmDQzX",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', `customer_email`, 'string') }}",
+        "subject": "New Order Received - Fashion Store",
+        "message": "=Dear Customer,\n\nThank you for your order at our Fashion Store! 🛍️\n\nYour order has been placed successfully.\n\nOrder Details:\n- Product: {{ $fromAI('product') }}\n- Size: {{ $fromAI('size') }}\n- Color: {{ $fromAI('color') }}\n- Status: Pending\n- Date: {{ new Date().toLocaleDateString() }}\n\nWe will process your order shortly and contact you via WhatsApp.\n\nThank you for shopping with us!\n\nFashion Store Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        288
+      ],
+      "id": "507ee5df-4543-43da-a418-cb31920dfb57",
+      "name": "Send a message in Gmail",
+      "webhookId": "2331919e-6f8d-43f3-89a2-4004e54ceaea",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Rl8jamWwMFO9zG9h",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        128,
+        256
+      ],
+      "id": "f750b73c-4e22-4d36-a8e4-29f655de77ae",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "0CgPvsbHeurIm12C",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Message": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "72793e56-f4ca-4ca5-a75b-10c9e8de3400",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c10e47287b1f18acbf9f6419dfb6881f3e7c887916fb9293ecf0d4718496549b"
+  },
+  "nodeGroups": [],
+  "id": "JawEkAzOabWO34Rb",
+  "tags": []
+}

@@ -40,7 +40,9 @@ WhatsApp Message
   ┌───┴────────────────┐           Tools Used:
   │                    │         - Google Sheets (Read)
 Send WhatsApp     Respond to    - Google Sheets (Append)
-   Reply            Webhook     - Gmail (Send Email)
+   Reply            Webhook     - Gmail (Send Email
+
+![Workflow](workflow.png)
 ```
 
 ---
